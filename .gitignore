@@ -1,3 +1,49 @@
+# Virtual Environment
 venv/
+env/
+.venv/
+
+# Screenshots and captures (personal photos)
+screenshots/
 capture*
 face_capture*
+*.jpg
+*.jpeg
+*.png
+*.avi
+*.mp4
+*.mov
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Jupyter Notebook (if you add later)
+.ipynb_checkpoints
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+
+# Environment variables (if you add later)
+.env
+.env.local
