@@ -129,6 +129,7 @@ Real-time hand tracking and gesture recognition using MediaPipe:
 - Recognizes gestures: Thumbs Up, Peace Sign, Pointing, Fist, Open Hand, Rock On
 - Labels each finger (Thumb, Index, Middle, Ring, Pinky)
 - Shows which hand (Left or Right)
+- **Supports both Webcam and ESP32-CAM** 📷
 
 **Run it:**
 ```bash
@@ -137,11 +138,51 @@ python hand_detection.py
 
 **Requires:**
 ```bash
-pip install mediapipe
+pip install mediapipe requests python-dotenv
 ```
 
 **Controls:**
 - `q` - Quit application
+- `s` - Save screenshot
+
+**Video Source Configuration:**
+
+The application uses environment variables for configuration (best practice!).
+
+**Setup:**
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` file with your settings:
+   ```bash
+   # .env file
+   USE_ESP32=True
+   ESP32_URL=http://YOUR_ESP32_IP/stream
+   ```
+
+**Option 1: ESP32-CAM (Default)**
+```bash
+USE_ESP32=True
+ESP32_URL=http://YOUR_ESP32_IP/stream
+```
+
+**Option 2: Webcam**
+```bash
+USE_ESP32=False
+```
+
+**Why environment variables?**
+- Secure - No sensitive data in code
+- Flexible - Each user has their own config
+- Professional - Industry standard practice
+- Git-friendly - `.env` is ignored by Git
+
+**Features:**
+- Automatic fallback to webcam if ESP32-CAM connection fails
+- Custom MJPEG stream parser for ESP32-CAM compatibility
+- Same interface for both video sources
 
 **Recognized Gestures:**
 - 👍 Thumbs Up - Only thumb extended
@@ -156,6 +197,7 @@ pip install mediapipe
 - Gesture-based game controls
 - Sign language recognition foundation
 - Control robots/cars with hand gestures
+- Remote hand gesture recognition via ESP32-CAM
 
 ---
 
@@ -252,6 +294,109 @@ Log detected objects:
 with open('detections.log', 'a') as f:
     f.write(f"{datetime.now()}: {label} detected with {confidence:.2f} confidence\n")
 ```
+
+## ESP32-CAM Integration
+
+### Overview
+
+The `hand_detection.py` application supports streaming video from an ESP32-CAM module instead of using a local webcam. This enables remote hand gesture recognition over WiFi.
+
+### Why ESP32-CAM?
+
+- **Wireless operation** - No USB cable needed
+- **Remote placement** - Place camera anywhere with WiFi coverage
+- **IoT integration** - Foundation for controlling ESP32-based devices with gestures
+- **Low cost** - ESP32-CAM modules are inexpensive (~$10)
+
+### Setup Requirements
+
+**Hardware:**
+- ESP32-CAM module
+- USB-to-Serial adapter (for programming)
+- Power supply (5V)
+
+**Software:**
+- Arduino IDE with ESP32 board support
+- ESP32-CAM firmware configured for MJPEG streaming
+
+### Configuration
+
+1. **Flash ESP32-CAM** with MJPEG stream firmware
+2. **Connect ESP32-CAM** to your WiFi network
+3. **Note the IP address** assigned to ESP32-CAM
+4. **Create `.env` file** (if not already created):
+   ```bash
+   cp .env.example .env
+   ```
+5. **Update `.env` file** with your ESP32-CAM IP:
+   ```bash
+   USE_ESP32=True
+   ESP32_URL=http://YOUR_ESP32_IP/stream
+   ```
+
+**Note:** The `.env` file is local to your machine and won't be committed to Git (it's in `.gitignore`)
+
+### How It Works
+
+**Custom Stream Parser:**
+
+The `ESP32CamStream` class in `hand_detection.py` provides a custom MJPEG parser that:
+- Connects to ESP32-CAM HTTP stream endpoint
+- Parses MJPEG boundary markers (`--frame`)
+- Extracts individual JPEG frames
+- Decodes frames to OpenCV format
+- Provides same interface as `cv2.VideoCapture()`
+
+**Why not use `cv2.VideoCapture()` directly?**
+
+OpenCV's built-in `VideoCapture()` doesn't reliably parse ESP32-CAM's MJPEG format. The custom parser handles the specific format used by ESP32-CAM firmware.
+
+### Testing ESP32-CAM Connection
+
+Use the standalone test script:
+
+```bash
+python test_esp32.py
+```
+
+This will:
+- Attempt connection to ESP32-CAM
+- Display live stream in window
+- Show frame count and resolution
+- Help diagnose connection issues
+
+### Fallback Behavior
+
+If ESP32-CAM connection fails, the application automatically falls back to webcam:
+
+```
+📷 Modo: ESP32-CAM
+🌐 URL: http://YOUR_ESP32_IP/stream
+❌ Erro ao conectar
+🔄 Tentando usar webcam como fallback...
+✅ Webcam conectada com sucesso!
+```
+
+This ensures the application always works even if ESP32-CAM is unavailable.
+
+### Troubleshooting ESP32-CAM
+
+**Connection fails:**
+- Verify ESP32-CAM is powered on
+- Check WiFi connection (ESP32-CAM and computer on same network)
+- Test URL in Safari browser first (Safari renders MJPEG streams)
+- Verify IP address is correct
+- Check firewall settings
+
+**Stream freezes:**
+- ESP32-CAM may need reset (power cycle)
+- Check WiFi signal strength
+- Reduce camera resolution in ESP32 firmware
+
+**Low frame rate:**
+- Normal for ESP32-CAM (typically 5-15 FPS)
+- Reduce resolution in firmware settings
+- Ensure good WiFi signal
 
 ## Troubleshooting
 
