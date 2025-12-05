@@ -3,25 +3,47 @@ Hand Detection Application - Main Entry Point
 
 This application detects hands in real-time from a camera feed and recognizes gestures.
 Supports both ESP32-CAM and regular webcams.
+Can send HTTP commands based on gestures for remote control.
 
 Controls:
 - Press 'q' to quit
 - Press 's' to save current frame
+- Press 'c' to toggle gesture control (HTTP commands)
 """
 import cv2
 import time
 from src import config
 from src.camera import initialize_camera
 from src.detection import HandDetector, count_fingers, recognize_gesture
+from src.control import GestureController
 
 
 def main():
     """Main application loop."""
+    print("Hand Detection Application")
+    print("=" * 50)
+    print()
+
     # Initialize camera
     cap = initialize_camera()
 
     # Initialize hand detector
     detector = HandDetector()
+
+    # Initialize gesture controller
+    controller = GestureController()
+    control_enabled = False  # Start with control disabled
+
+    print()
+    print("Controls:")
+    print("  - Press 'q' to quit")
+    print("  - Press 's' to save current frame")
+    print("  - Press 'c' to toggle gesture control (HTTP commands)")
+    print()
+    print(f"Gesture Control: {'ENABLED' if control_enabled else 'DISABLED'}")
+    print(f"Target URL: {controller.url}")
+    print("=" * 50)
+    print()
 
     # Main processing loop
     while True:
@@ -55,8 +77,20 @@ def main():
                 fingers = count_fingers(hand_landmarks, handedness)
                 gesture = recognize_gesture(fingers)
 
+                # Send HTTP command if control is enabled
+                if control_enabled:
+                    controller.send_gesture_command(gesture)
+
                 # Display gesture information
                 draw_gesture_info(frame, hand_landmarks, gesture, handedness)
+
+        # Display control status indicator
+        if control_enabled:
+            cv2.putText(frame, "CONTROL: ON", (frame.shape[1] - 150, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        else:
+            cv2.putText(frame, "CONTROL: OFF", (frame.shape[1] - 160, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         # Display the frame
         cv2.imshow(config.WINDOW_NAME, frame)
@@ -68,6 +102,12 @@ def main():
             break
         elif key == ord('s'):
             save_frame(frame)
+        elif key == ord('c'):
+            control_enabled = not control_enabled
+            status = "ENABLED" if control_enabled else "DISABLED"
+            print(f"\n{'='*50}")
+            print(f"Gesture Control: {status}")
+            print(f"{'='*50}\n")
 
     # Clean up
     cleanup(cap, detector)

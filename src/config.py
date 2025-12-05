@@ -30,3 +30,15 @@ PERSON_MIN_SIZE = (60, 120) # Minimum person size in pixels (width, height) - ta
 FACE_SCALE_FACTOR = PERSON_SCALE_FACTOR
 FACE_MIN_NEIGHBORS = PERSON_MIN_NEIGHBORS
 FACE_MIN_SIZE = PERSON_MIN_SIZE
+
+# Gesture Control Configuration (HTTP Commands)
+CONTROL_URL = os.getenv('CONTROL_URL', 'http://YOUR_URL')
+HTTP_TIMEOUT = 2  # Seconds to wait for HTTP response
+GESTURE_DEBOUNCE = 0.25  # Seconds between ANY command (250ms debounce)
+
+# Gesture to Command Mapping (sent as JSON in body)
+# Only two commands: "follow" (open hand) and "stop" (fist)
+GESTURE_COMMANDS = {
+    'Open Hand': 'follow',   # Open hand = follow
+    'Fist': 'stop',          # Fist = stop
+}
