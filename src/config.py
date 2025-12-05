@@ -20,3 +20,13 @@ MIN_TRACKING_CONFIDENCE = 0.5
 # Display Configuration
 WINDOW_NAME = 'Hand Detection'
 MIRROR_CAMERA = True  # Flip camera horizontally for mirror effect
+
+# Person Detection Configuration (Full Body)
+PERSON_SCALE_FACTOR = 1.1  # Image pyramid scale (lower = more accurate but slower)
+PERSON_MIN_NEIGHBORS = 3   # Detection strictness (lower for full body detection)
+PERSON_MIN_SIZE = (60, 120) # Minimum person size in pixels (width, height) - taller for body
+
+# Legacy face detection configs (kept for backward compatibility)
+FACE_SCALE_FACTOR = PERSON_SCALE_FACTOR
+FACE_MIN_NEIGHBORS = PERSON_MIN_NEIGHBORS
+FACE_MIN_SIZE = PERSON_MIN_SIZE
