@@ -41,4 +41,7 @@ GESTURE_DEBOUNCE = 0.25  # Seconds between ANY command (250ms debounce)
 GESTURE_COMMANDS = {
     'Open Hand': 'follow',   # Open hand = follow
     'Fist': 'stop',          # Fist = stop
+    'Pointing': 'turn-right', 
+    'Peace Sign': 'turn-left',
+    'Thumbs Up': 'backward'
 }
