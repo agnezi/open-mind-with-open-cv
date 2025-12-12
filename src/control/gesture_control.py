@@ -39,7 +39,7 @@ class GestureController:
         print(f"  Debounce: {self.debounce * 1000}ms")
         print(f"  Mode: {'Async (non-blocking)' if async_mode else 'Sync (blocking)'}")
 
-    def send_gesture_command(self, gesture: str) -> bool:
+    def send_gesture_command(self, gesture: str, handedness: Optional[str] = None) -> bool:
         """
         Send HTTP POST command with JSON body for a recognized gesture.
 
@@ -51,6 +51,10 @@ class GestureController:
         """
         # Check if gesture is mapped to a command
         if gesture not in config.GESTURE_COMMANDS:
+            return False
+        
+        # Filter by handdedness - only right hand gestures send commans
+        if handedness is not None and handedness != "Right":
             return False
 
         # Check global debounce to prevent rapid commands

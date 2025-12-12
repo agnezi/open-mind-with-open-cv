@@ -79,7 +79,7 @@ def main():
 
                 # Send HTTP command if control is enabled
                 if control_enabled:
-                    controller.send_gesture_command(gesture)
+                    controller.send_gesture_command(gesture, handedness)
 
                 # Display gesture information
                 draw_gesture_info(frame, hand_landmarks, gesture, handedness)
