@@ -8,28 +8,14 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Camera Configuration
-USE_ESP32 = os.getenv('USE_ESP32', 'True').lower() in ('true', '1', 'yes')
-ESP32_URL = os.getenv('ESP32_URL', 'YOUR_URL')
-
 # Hand Detection Configuration
-MAX_NUM_HANDS = 2
-MIN_DETECTION_CONFIDENCE = 0.5
-MIN_TRACKING_CONFIDENCE = 0.5
+MAX_NUM_HANDS = int(os.getenv('MAX_NUM_HANDS', '2'))
+MIN_DETECTION_CONFIDENCE = float(os.getenv('MIN_DETECTION_CONFIDENCE', '0.8'))  # Increased from 0.5 to 0.8 to prevent face detection
+MIN_TRACKING_CONFIDENCE = float(os.getenv('MIN_TRACKING_CONFIDENCE', '0.5'))
 
 # Display Configuration
 WINDOW_NAME = 'Hand Detection'
 MIRROR_CAMERA = True  # Flip camera horizontally for mirror effect
-
-# Person Detection Configuration (Full Body)
-PERSON_SCALE_FACTOR = 1.1  # Image pyramid scale (lower = more accurate but slower)
-PERSON_MIN_NEIGHBORS = 3   # Detection strictness (lower for full body detection)
-PERSON_MIN_SIZE = (60, 120) # Minimum person size in pixels (width, height) - taller for body
-
-# Legacy face detection configs (kept for backward compatibility)
-FACE_SCALE_FACTOR = PERSON_SCALE_FACTOR
-FACE_MIN_NEIGHBORS = PERSON_MIN_NEIGHBORS
-FACE_MIN_SIZE = PERSON_MIN_SIZE
 
 # Gesture Control Configuration (HTTP Commands)
 CONTROL_URL = os.getenv('CONTROL_URL', 'http://YOUR_URL')
@@ -41,7 +27,11 @@ GESTURE_DEBOUNCE = 0.25  # Seconds between ANY command (250ms debounce)
 GESTURE_COMMANDS = {
     'Open Hand': 'follow',   # Open hand = follow
     'Fist': 'stop',          # Fist = stop
-    'Pointing': 'turn-right', 
+    'Pointing': 'turn-right',
     'Peace Sign': 'turn-left',
     'Thumbs Up': 'backward'
 }
+
+# Telemetry Configuration
+TELEMETRY_ENABLED = os.getenv('TELEMETRY_ENABLED', 'True').lower() in ('true', '1', 'yes')
+TELEMETRY_SMOOTHING = float(os.getenv('TELEMETRY_SMOOTHING', '0.1'))  # FPS smoothing factor (0.0-1.0, lower = smoother)

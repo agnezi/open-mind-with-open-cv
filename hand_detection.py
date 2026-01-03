@@ -16,6 +16,7 @@ from src import config
 from src.camera import initialize_camera
 from src.detection import HandDetector, count_fingers, recognize_gesture
 from src.control import GestureController
+from src.monitoring import TelemetryMonitor
 
 
 def main():
@@ -34,6 +35,12 @@ def main():
     controller = GestureController()
     control_enabled = False  # Start with control disabled
 
+    # Initialize telemetry monitor
+    monitor = TelemetryMonitor(
+        enabled=config.TELEMETRY_ENABLED,
+        smoothing=config.TELEMETRY_SMOOTHING
+    )
+
     print()
     print("Controls:")
     print("  - Press 'q' to quit")
@@ -47,6 +54,9 @@ def main():
 
     # Main processing loop
     while True:
+        # Track frame timing for FPS calculation
+        monitor.start_frame()
+
         # Read frame from camera
         success, frame = cap.read()
 
@@ -95,6 +105,9 @@ def main():
         # Display the frame
         cv2.imshow(config.WINDOW_NAME, frame)
 
+        # Display live telemetry
+        monitor.print_status()
+
         # Handle keyboard input
         key = cv2.waitKey(1) & 0xFF
 
@@ -110,7 +123,7 @@ def main():
             print(f"{'='*50}\n")
 
     # Clean up
-    cleanup(cap, detector)
+    cleanup(cap, detector, monitor)
 
 
 def draw_gesture_info(frame, hand_landmarks, gesture, handedness):
@@ -169,17 +182,19 @@ def save_frame(frame):
     print(f"Saved frame as {filename}")
 
 
-def cleanup(cap, detector):
+def cleanup(cap, detector, monitor):
     """
     Clean up resources before exit.
 
     Args:
         cap: Camera capture object
         detector: HandDetector object
+        monitor: TelemetryMonitor object
     """
     cap.release()
     cv2.destroyAllWindows()
     detector.close()
+    monitor.print_final_stats()
     print("\nApplication closed successfully")
 
 

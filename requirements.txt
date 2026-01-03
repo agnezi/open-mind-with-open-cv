@@ -23,6 +23,7 @@ opt_einsum==3.4.0
 packaging==25.0
 pillow==11.3.0
 protobuf==4.25.8
+psutil==6.1.1
 pycparser==2.23
 pyparsing==3.2.5
 python-dateutil==2.9.0.post0
